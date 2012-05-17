@@ -1,0 +1,3 @@
+[submodule "EigenHelpers"]
+	path = EigenHelpers
+	url = git@github.com:daviddoria/EigenHelpers.git
