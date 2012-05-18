@@ -21,4 +21,4 @@ add_library(KMeansClustering KMeansClustering.cpp)
 TARGET_LINK_LIBRARIES(KMeansClustering EigenHelpers)
 
 ADD_EXECUTABLE(KMeansClusteringExample Example.cpp)
-TARGET_LINK_LIBRARIES(KMeansClustering KMeansClustering EigenHelpers)
+TARGET_LINK_LIBRARIES(KMeansClusteringExample KMeansClustering EigenHelpers)
