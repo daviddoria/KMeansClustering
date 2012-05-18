@@ -65,11 +65,11 @@ void KMeansClustering::Cluster()
     }
 
   // Output cluster centers
-  std::cout << "Initial cluster centers: " << std::endl;
-  for(unsigned int i = 0; i < ClusterCenters.size(); i++)
-    {
-    std::cout << "Cluster center " << i << " : " << ClusterCenters[i] << std::endl;
-    }
+//   std::cout << "Initial cluster centers: " << std::endl;
+//   for(unsigned int i = 0; i < ClusterCenters.size(); i++)
+//     {
+//     std::cout << "Cluster center " << i << " : " << ClusterCenters[i] << std::endl;
+//     }
 
   // We must store the labels at the previous iteration to determine whether any labels changed at each iteration.
   std::vector<unsigned int> oldLabels(this->Points.size(), 0); // initialize to all zeros
@@ -140,7 +140,7 @@ unsigned int KMeansClustering::SelectWeightedIndex(std::vector<double> weights)
       }
     }
 
-  Helpers::Output(weights);
+  //Helpers::Output(weights);
   
   // Sum
   double sum = std::accumulate(weights.begin(), weights.end(), 0.0f);
