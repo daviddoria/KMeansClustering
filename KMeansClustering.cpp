@@ -40,6 +40,14 @@ KMeansClustering::KMeansClustering()
 
 void KMeansClustering::Cluster()
 {
+  if(this->Points.size() < this->K)
+  {
+    std::stringstream ss;
+    ss << "The number of points (" << this->Points.size()
+       << " must be larger than the number of clusters (" << this->K << ")";
+    throw std::runtime_error(ss.str());
+  }
+  
   // Seed a random number generator
   if(this->Random)
     {
