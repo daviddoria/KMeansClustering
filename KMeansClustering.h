@@ -1,6 +1,6 @@
 /*=========================================================================
  *
- *  Copyright David Doria 2011 daviddoria@gmail.com
+ *  Copyright David Doria 2012 daviddoria@gmail.com
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@ an unorganized set of input points.
 class KMeansClustering
 {
 public:
-  typedef std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf> > VectorOfPoints;
+  typedef Eigen::VectorXf PointType;
+  typedef std::vector<PointType, Eigen::aligned_allocator<PointType> > VectorOfPoints;
 
   /** Constructor. */
   KMeansClustering();
@@ -75,12 +76,12 @@ protected:
   /** Initialize cluster centers using the KMeans++ algorithm */
   void KMeansPPInit();
 
-  unsigned int ClosestCluster(const Eigen::VectorXf& queryPoint);
+  unsigned int ClosestCluster(const PointType& queryPoint);
   
-  unsigned int ClosestPointIndex(const Eigen::VectorXf& queryPoint);
-  double ClosestPointDistance(const Eigen::VectorXf& queryPoint);
-  double ClosestPointDistanceExcludingId(const Eigen::VectorXf& queryPoint, const unsigned int excludedId);
-  double ClosestPointDistanceExcludingIds(const Eigen::VectorXf& queryPoint, const std::vector<unsigned int> excludedIds);
+  unsigned int ClosestPointIndex(const PointType& queryPoint);
+  double ClosestPointDistance(const PointType& queryPoint);
+  double ClosestPointDistanceExcludingId(const PointType& queryPoint, const unsigned int excludedId);
+  double ClosestPointDistanceExcludingIds(const PointType& queryPoint, const std::vector<unsigned int> excludedIds);
 
   /** Based on the current cluster membership, compute the cluster centers. */
   void EstimateClusterCenters();
@@ -88,7 +89,7 @@ protected:
   void AssignLabels();
   bool CheckChanged(const std::vector<unsigned int> labels, const std::vector<unsigned int> oldLabels);
 
-  Eigen::VectorXf GetRandomPointInBounds();
+  PointType GetRandomPointInBounds();
   unsigned int SelectWeightedIndex(std::vector<double> weights); // Intentionally not passed by reference
 
 private:
