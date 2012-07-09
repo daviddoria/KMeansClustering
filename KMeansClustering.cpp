@@ -135,7 +135,7 @@ KMeansClustering::VectorOfPoints KMeansClustering::GetPointsWithLabel(const unsi
   return points;
 }
 
-unsigned int KMeansClustering::SelectWeightedIndex(std::vector<double> weights)
+unsigned int KMeansClustering::SelectWeightedIndex(const std::vector<double>& weights)
 {
   // Ensure all weights are positive
   for(unsigned int i = 0; i < weights.size(); i++)
@@ -161,17 +161,14 @@ unsigned int KMeansClustering::SelectWeightedIndex(std::vector<double> weights)
     }
 
   // Normalize
-  for(unsigned int i = 0; i < weights.size(); i++)
-    {
-    weights[i] /= sum;
-    }
+  std::vector<double> normalizedWeights = Helpers::NormalizeVector(weights);
 
   double randomValue = drand48();
 
   double runningTotal = 0.0;
-  for(unsigned int i = 0; i < weights.size(); i++)
+  for(unsigned int i = 0; i < normalizedWeights.size(); i++)
     {
-    runningTotal += weights[i];
+    runningTotal += normalizedWeights[i];
     if(randomValue < runningTotal)
       {
       return i;
@@ -353,7 +350,7 @@ void KMeansClustering::KMeansPPInit()
       {
       PointType currentPoint = this->Points[i];
       unsigned int closestCluster = ClosestCluster(currentPoint);
-      weights[i] = (ClusterCenters[closestCluster] - currentPoint).norm();
+      weights[i] = (this->ClusterCenters[closestCluster] - currentPoint).norm();
       }
 
     unsigned int selectedPointId = SelectWeightedIndex(weights);
