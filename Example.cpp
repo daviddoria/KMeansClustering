@@ -1,6 +1,6 @@
 /*=========================================================================
  *
- *  Copyright David Doria 2011 daviddoria@gmail.com
+ *  Copyright David Doria 2012 daviddoria@gmail.com
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ KMeansClustering::VectorOfPoints GenerateData()
 {
   KMeansClustering::VectorOfPoints points;
 
-  Eigen::VectorXf p = Eigen::VectorXf::Zero(2);
+  KMeansClustering::PointType p = KMeansClustering::PointType::Zero(2);
   p[0] = 10; p[1] = 10;
   points.push_back(p);
   p[0] = 10.1; p[1] = 10.1;

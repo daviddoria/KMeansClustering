@@ -1,6 +1,6 @@
 /*=========================================================================
  *
- *  Copyright David Doria 2011 daviddoria@gmail.com
+ *  Copyright David Doria 2012 daviddoria@gmail.com
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -33,13 +33,16 @@ an unorganized set of input points.
 class KMeansClustering
 {
 public:
-  typedef std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf> > VectorOfPoints;
+  typedef Eigen::VectorXf PointType;
+  typedef std::vector<PointType, Eigen::aligned_allocator<PointType> > VectorOfPoints;
 
   /** Constructor. */
   KMeansClustering();
 
-  /** The number of clusters to find */
+  /** Set the number of clusters to find */
   void SetK(const unsigned int k);
+
+  /** Get the number of clusters to find */
   unsigned int GetK();
 
   std::vector<unsigned int> GetIndicesWithLabel(const unsigned int label);
@@ -75,21 +78,35 @@ protected:
   /** Initialize cluster centers using the KMeans++ algorithm */
   void KMeansPPInit();
 
-  unsigned int ClosestCluster(const Eigen::VectorXf& queryPoint);
-  
-  unsigned int ClosestPointIndex(const Eigen::VectorXf& queryPoint);
-  double ClosestPointDistance(const Eigen::VectorXf& queryPoint);
-  double ClosestPointDistanceExcludingId(const Eigen::VectorXf& queryPoint, const unsigned int excludedId);
-  double ClosestPointDistanceExcludingIds(const Eigen::VectorXf& queryPoint, const std::vector<unsigned int> excludedIds);
+  /** Get the membership of 'queryPoint'. */
+  unsigned int ClosestCluster(const PointType& queryPoint);
+
+  /** Get the id of the closest point to 'queryPoint'. */
+  unsigned int ClosestPointIndex(const PointType& queryPoint);
+
+  /** Get the distance between 'queryPoint' and its closest point. */
+  double ClosestPointDistance(const PointType& queryPoint);
+
+  /** Get the distance between 'queryPoint' and its closest point excluding 'excludedId'. */
+  double ClosestPointDistanceExcludingId(const PointType& queryPoint, const unsigned int excludedId);
+
+  /** Get the distance between 'queryPoint' and its closest point excluding 'excludedIds'. */
+  double ClosestPointDistanceExcludingIds(const PointType& queryPoint, const std::vector<unsigned int> excludedIds);
 
   /** Based on the current cluster membership, compute the cluster centers. */
   void EstimateClusterCenters();
-  
+
+  /** Construct an array of the closest cluster center to each point. */
   void AssignLabels();
+
+  /** Determine if the membership of any point has changed. */
   bool CheckChanged(const std::vector<unsigned int> labels, const std::vector<unsigned int> oldLabels);
 
-  Eigen::VectorXf GetRandomPointInBounds();
-  unsigned int SelectWeightedIndex(std::vector<double> weights); // Intentionally not passed by reference
+  /** Get a random point inside the bounding box of the points. */
+  PointType GetRandomPointInBounds();
+
+  /** Select a random index, with the probability of choosing an index weighted by the 'weights' vector. */
+  unsigned int SelectWeightedIndex(const std::vector<double>& weights); // Intentionally not passed by reference
 
 private:
 
