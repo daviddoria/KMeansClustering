@@ -1,0 +1,1 @@
+This is a c++ implementation of the K-Means clustering algorithm. It also includes the KMeans++ initialization algorithm.
