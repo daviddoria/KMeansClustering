@@ -39,18 +39,21 @@ public:
   /** Constructor. */
   KMeansClustering();
 
-  /** Set the number of clusters to find */
+  /** Set the number of clusters to find. */
   void SetK(const unsigned int k);
 
-  /** Get the number of clusters to find */
+  /** Get the number of clusters to find. */
   unsigned int GetK();
+
+  /** Get the cluster centers.*/
+  VectorOfPoints GetClusterCenters();
 
   std::vector<unsigned int> GetIndicesWithLabel(const unsigned int label);
   VectorOfPoints GetPointsWithLabel(const unsigned int label);
 
   /**
    * If this function is called, the randomness
-   * is removed for repeatability for testing
+   * is removed for repeatability for testing.
    */
   void SetRandom(const bool r);
 
