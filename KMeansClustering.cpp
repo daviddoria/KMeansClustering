@@ -71,13 +71,6 @@ void KMeansClustering::Cluster()
     throw std::runtime_error("An invalid initialization method has been specified!");
   }
 
-  // Output cluster centers
-//   std::cout << "Initial cluster centers: " << std::endl;
-//   for(unsigned int i = 0; i < ClusterCenters.size(); i++)
-//     {
-//     std::cout << "Cluster center " << i << " : " << ClusterCenters[i] << std::endl;
-//     }
-
   // We must store the labels at the previous iteration to determine whether any labels changed at each iteration.
   std::vector<unsigned int> oldLabels(this->Points.size(), 0); // initialize to all zeros
 
@@ -106,7 +99,7 @@ void KMeansClustering::Cluster()
   std::cout << "KMeans finished in " << iter << " iterations." << std::endl;
 }
 
-std::vector<unsigned int> KMeansClustering::GetIndicesWithLabel(unsigned int label)
+std::vector<unsigned int> KMeansClustering::GetIndicesWithLabel(const unsigned int label)
 {
   std::vector<unsigned int> pointsWithLabel;
   for(unsigned int i = 0; i < this->Labels.size(); i++)
@@ -386,17 +379,6 @@ void KMeansClustering::SetPoints(const VectorOfPoints& points)
 std::vector<unsigned int> KMeansClustering::GetLabels()
 {
   return this->Labels;
-}
-
-void KMeansClustering::OutputClusterCenters()
-{
-  std::cout << std::endl << "Cluster centers: " << std::endl;
-  
-  for(unsigned int i = 0; i < ClusterCenters.size(); ++i)
-  {
-    std::cout << ClusterCenters[i] << " ";
-  }
-  std::cout << std::endl;
 }
 
 KMeansClustering::VectorOfPoints KMeansClustering::GetClusterCenters()

@@ -40,6 +40,10 @@ int main(int, char *[])
     return EXIT_FAILURE;
   }
 
+  // Get all points that belong to cluster 0
+  std::vector<unsigned int> pointsInCluster0 = kmeans.GetPointIdsWithLabel(0);
+  std::cout << "There are " << pointsInCluster0.size() << " pointsInCluster0" << std::endl;
+
   return EXIT_SUCCESS;
 }
 

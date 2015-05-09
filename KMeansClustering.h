@@ -48,7 +48,10 @@ public:
   /** Get the cluster centers.*/
   VectorOfPoints GetClusterCenters();
 
+  /** Get the point ids with a specified cluster membership. */
   std::vector<unsigned int> GetIndicesWithLabel(const unsigned int label);
+
+  /** Get the points with a specified cluster membership. */
   VectorOfPoints GetPointsWithLabel(const unsigned int label);
 
   /**
@@ -60,8 +63,9 @@ public:
   /** Set the points to cluster. */
   void SetPoints(const VectorOfPoints& points);
 
+  /** Get the cluster membership of every point. */
   std::vector<unsigned int> GetLabels();
-  
+
   /** Set which initialization method to use. */
   void SetInitMethod(const int method);
 
@@ -71,8 +75,6 @@ public:
   /** Actually perform the clustering. */
   void Cluster();
 
-  void OutputClusterCenters();
-  
 protected:
 
   /** Randomly initialize cluster centers */
@@ -113,14 +115,14 @@ protected:
 
 private:
 
-  /** The label (cluster ID) of each point. */
+  /** The label (cluster membership) of each point. */
   std::vector<unsigned int> Labels;
 
   /** Should the computation be random? If false, then it is repeatable (for testing). */
-  bool Random;
+  bool Random = false;
 
   /** The initialization method to use */
-  int InitMethod;
+  int InitMethod = RANDOM;
 
   /** The number of clusters to find */
   unsigned int K;
