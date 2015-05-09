@@ -1,6 +1,6 @@
 [submodule "EigenHelpers"]
 	path = EigenHelpers
-	url = git@github.com:daviddoria/EigenHelpers.git
+	url = ../EigenHelpers.git
 [submodule "Helpers"]
 	path = Helpers
-	url = git@github.com:daviddoria/Helpers.git
+	url = ../Helpers.git
