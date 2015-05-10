@@ -112,7 +112,7 @@ protected:
   Eigen::VectorXd GetRandomPointInBounds();
 
   /** Select a random index, with the probability of choosing an index weighted by the 'weights' vector. */
-  unsigned int SelectWeightedIndex(const std::vector<double>& weights); // Intentionally not passed by reference
+  unsigned int SelectWeightedIndex(const Eigen::VectorXd weights);
 
 private:
 

@@ -29,7 +29,7 @@ int main(int, char *[])
   kmeans.SetK(2);
   kmeans.SetPoints(points);
   kmeans.SetInitMethod(KMeansClustering::KMEANSPP);
-  //kmeans.SetRandom(false); // for repeatable results
+  kmeans.SetRandom(false); // for repeatable results
   kmeans.SetRandom(true); // for real, random results
   kmeans.Cluster();
 

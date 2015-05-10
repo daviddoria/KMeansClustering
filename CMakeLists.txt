@@ -23,21 +23,15 @@ if(NOT EIGEN3_FOUND)
 endif()
 
 # Submodules
-
-# Only include EigenHelpers if it is not already available
-if(NOT TARGET EigenHelpers)
-  add_subdirectory(EigenHelpers)
-endif()
-
 if(NOT TARGET Helpers)
  add_subdirectory(Helpers)
 endif()
 
 add_library(KMeansClustering KMeansClustering.cpp)
-TARGET_LINK_LIBRARIES(KMeansClustering EigenHelpers)
+#TARGET_LINK_LIBRARIES(KMeansClustering )
 
 SET(KMeansClustering_BuildExamples OFF CACHE BOOL "KMeansClustering_BuildExamples")
 if(KMeansClustering_BuildExamples)
-  ADD_EXECUTABLE(KMeansClusteringExample Example.cpp)
-  TARGET_LINK_LIBRARIES(KMeansClusteringExample KMeansClustering EigenHelpers)
+  ADD_EXECUTABLE(KMeansClusteringExample KMeansClusteringExample.cpp)
+  TARGET_LINK_LIBRARIES(KMeansClusteringExample KMeansClustering)
 endif(KMeansClustering_BuildExamples)

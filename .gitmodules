@@ -1,6 +1,3 @@
-[submodule "EigenHelpers"]
-	path = EigenHelpers
-	url = ../EigenHelpers.git
 [submodule "Helpers"]
 	path = Helpers
 	url = ../Helpers.git
