@@ -19,6 +19,9 @@
 /*
 KMeans clustering is a method in which to form K (known) clusters of points from
 an unorganized set of input points.
+Data in this class is stored as an Eigen matrix, where the data points are column vectors.
+That is, if we have P N-D points, the matrix is N rows by P columns.
+Likewise, objects returned have the same structure (e.g. GetClusterCenters() returns an NxK matrix).
 */
 
 #ifndef KMeansClustering_h
@@ -33,8 +36,6 @@ an unorganized set of input points.
 class KMeansClustering
 {
 public:
-  typedef Eigen::VectorXf PointType;
-  typedef std::vector<PointType, Eigen::aligned_allocator<PointType> > VectorOfPoints;
 
   /** Constructor. */
   KMeansClustering();
@@ -46,13 +47,13 @@ public:
   unsigned int GetK();
 
   /** Get the cluster centers.*/
-  VectorOfPoints GetClusterCenters();
+  Eigen::MatrixXd GetClusterCenters();
 
   /** Get the point ids with a specified cluster membership. */
   std::vector<unsigned int> GetIndicesWithLabel(const unsigned int label);
 
   /** Get the points with a specified cluster membership. */
-  VectorOfPoints GetPointsWithLabel(const unsigned int label);
+  Eigen::MatrixXd GetPointsWithLabel(const unsigned int label);
 
   /**
    * If this function is called, the randomness
@@ -61,7 +62,7 @@ public:
   void SetRandom(const bool r);
 
   /** Set the points to cluster. */
-  void SetPoints(const VectorOfPoints& points);
+  void SetPoints(const Eigen::MatrixXd& points);
 
   /** Get the cluster membership of every point. */
   std::vector<unsigned int> GetLabels();
@@ -84,19 +85,19 @@ protected:
   void KMeansPPInit();
 
   /** Get the membership of 'queryPoint'. */
-  unsigned int ClosestCluster(const PointType& queryPoint);
+  unsigned int ClosestCluster(const Eigen::VectorXd& queryPoint);
 
   /** Get the id of the closest point to 'queryPoint'. */
-  unsigned int ClosestPointIndex(const PointType& queryPoint);
+  unsigned int ClosestPointIndex(const Eigen::VectorXd& queryPoint);
 
   /** Get the distance between 'queryPoint' and its closest point. */
-  double ClosestPointDistance(const PointType& queryPoint);
+  double ClosestPointDistance(const Eigen::VectorXd& queryPoint);
 
   /** Get the distance between 'queryPoint' and its closest point excluding 'excludedId'. */
-  double ClosestPointDistanceExcludingId(const PointType& queryPoint, const unsigned int excludedId);
+  double ClosestPointDistanceExcludingId(const Eigen::VectorXd& queryPoint, const unsigned int excludedId);
 
   /** Get the distance between 'queryPoint' and its closest point excluding 'excludedIds'. */
-  double ClosestPointDistanceExcludingIds(const PointType& queryPoint, const std::vector<unsigned int> excludedIds);
+  double ClosestPointDistanceExcludingIds(const Eigen::VectorXd& queryPoint, const std::vector<unsigned int> excludedIds);
 
   /** Based on the current cluster membership, compute the cluster centers. */
   void EstimateClusterCenters();
@@ -108,7 +109,7 @@ protected:
   bool CheckChanged(const std::vector<unsigned int> labels, const std::vector<unsigned int> oldLabels);
 
   /** Get a random point inside the bounding box of the points. */
-  PointType GetRandomPointInBounds();
+  Eigen::VectorXd GetRandomPointInBounds();
 
   /** Select a random index, with the probability of choosing an index weighted by the 'weights' vector. */
   unsigned int SelectWeightedIndex(const std::vector<double>& weights); // Intentionally not passed by reference
@@ -128,10 +129,10 @@ private:
   unsigned int K;
   
   /** The points to cluster. */
-  VectorOfPoints Points;
+  Eigen::MatrixXd Points;
 
   /** The current cluster centers. */
-  VectorOfPoints ClusterCenters;
+  Eigen::MatrixXd ClusterCenters;
 };
 
 #endif

@@ -113,18 +113,18 @@ std::vector<unsigned int> KMeansClustering::GetIndicesWithLabel(const unsigned i
   return pointsWithLabel;
 }
 
-KMeansClustering::VectorOfPoints KMeansClustering::GetPointsWithLabel(const unsigned int label)
+Eigen::MatrixXd KMeansClustering::GetPointsWithLabel(const unsigned int label)
 {
-  KMeansClustering::VectorOfPoints points;
-  
   std::vector<unsigned int> indicesWithLabel = GetIndicesWithLabel(label);
+
+  Eigen::MatrixXd pointsWithLabel(this->Points.rows(), indicesWithLabel.size());
 
   for(unsigned int i = 0; i < indicesWithLabel.size(); i++)
   {
-    points.push_back(this->Points[indicesWithLabel[i]]);
+    pointsWithLabel.col(i) = this->Points.col(indicesWithLabel[i]);
   }
 
-  return points;
+  return pointsWithLabel;
 }
 
 unsigned int KMeansClustering::SelectWeightedIndex(const std::vector<double>& weights)
@@ -174,12 +174,12 @@ unsigned int KMeansClustering::SelectWeightedIndex(const std::vector<double>& we
   return 0;
 }
 
-KMeansClustering::PointType KMeansClustering::GetRandomPointInBounds()
+Eigen::VectorXd KMeansClustering::GetRandomPointInBounds()
 {
-  PointType minVector = EigenHelpers::ComputeMinVector(Points);
-  PointType maxVector = EigenHelpers::ComputeMaxVector(Points);
+  Eigen::VectorXd minVector = this->Points.rowwise().minCoeff();
+  Eigen::VectorXd maxVector = this->Points.rowwise().maxCoeff();
 
-  PointType randomVector = PointType::Zero(minVector.size());
+  Eigen::VectorXd randomVector = Eigen::VectorXd::Zero(minVector.size());
 
   for(int i = 0; i < randomVector.size(); ++i)
   {
@@ -208,50 +208,48 @@ bool KMeansClustering::CheckChanged(std::vector<unsigned int> labels, std::vecto
 void KMeansClustering::AssignLabels()
 {
   // Assign each point to the closest cluster
-  for(unsigned int point = 0; point < Points.size(); ++point)
+  for(unsigned int point = 0; point < this->Points.cols(); ++point)
   {
-    unsigned int closestCluster = ClosestCluster(Points[point]);
+    unsigned int closestCluster = ClosestCluster(this->Points.col(point));
     this->Labels[point] = closestCluster;
   }
 }
 
 void KMeansClustering::EstimateClusterCenters()
 {
-  VectorOfPoints oldCenters = this->ClusterCenters;
+  Eigen::MatrixXd oldCenters = this->ClusterCenters;
 
   for(unsigned int cluster = 0; cluster < this->K; ++cluster)
   {
-    VectorOfPoints classPoints;
+    std::vector<unsigned int> indicesWithLabel = GetIndicesWithLabel(cluster);
+    Eigen::MatrixXd classPoints(this->Points.rows(), indicesWithLabel.size());
     for(unsigned int point = 0; point < Points.size(); point++)
     {
-      if(this->Labels[point] == cluster)
-      {
-        classPoints.push_back(Points[point]);
-      }
+      classPoints.col(point) = this->Points.col(indicesWithLabel[point]);
     }
-    PointType center;
+
+    Eigen::VectorXd center;
     if(classPoints.size() == 0)
     {
-      center = oldCenters[cluster];
+      center = oldCenters.col(cluster);
     }
     else
     {
-      center = EigenHelpers::ComputeMeanVector(classPoints);
+      center = classPoints.rowwise().mean();
     }
 
-    ClusterCenters[cluster] = center;
+    this->ClusterCenters.col(cluster) = center;
   }
 }
 
-unsigned int KMeansClustering::ClosestCluster(const PointType& queryPoint)
+unsigned int KMeansClustering::ClosestCluster(const Eigen::VectorXd& queryPoint)
 {
   // Should NOT use the KDTree here, as the clusters are always changing (would have to rebuild the tree each iteration)!
   unsigned int closestCluster = 0;
   double minDist = std::numeric_limits<double>::max();
-  for(unsigned int i = 0; i < ClusterCenters.size(); ++i)
+  for(unsigned int i = 0; i < this->ClusterCenters.size(); ++i)
   {
-
-    double dist = (ClusterCenters[i] - queryPoint).norm();
+    double dist = (this->ClusterCenters.col(i) - queryPoint).norm();
     if(dist < minDist)
     {
       minDist = dist;
@@ -262,15 +260,15 @@ unsigned int KMeansClustering::ClosestCluster(const PointType& queryPoint)
   return closestCluster;
 }
 
-unsigned int KMeansClustering::ClosestPointIndex(const PointType& queryPoint)
+unsigned int KMeansClustering::ClosestPointIndex(const Eigen::VectorXd& queryPoint)
 {
   // Should use the KDTree here!
   unsigned int closestPoint = 0;
   double minDist = std::numeric_limits<double>::max();
-  for(unsigned int i = 0; i < Points.size(); i++)
+  for(unsigned int i = 0; i < this->Points.size(); i++)
   {
     //double dist = sqrt(vtkMath::Distance2BetweenPoints(points->GetPoint(i), queryPoint));
-    double dist = (Points[i] - queryPoint).norm();
+    double dist = (this->Points.col(i) - queryPoint).norm();
     if(dist < minDist)
     {
       minDist = dist;
@@ -281,23 +279,23 @@ unsigned int KMeansClustering::ClosestPointIndex(const PointType& queryPoint)
   return closestPoint;
 }
 
-double KMeansClustering::ClosestPointDistanceExcludingId(const PointType& queryPoint, const unsigned int excludedId)
+double KMeansClustering::ClosestPointDistanceExcludingId(const Eigen::VectorXd& queryPoint, const unsigned int excludedId)
 {
   std::vector<unsigned int> excludedIds;
   excludedIds.push_back(excludedId);
   return ClosestPointDistanceExcludingIds(queryPoint, excludedIds);
 }
 
-double KMeansClustering::ClosestPointDistanceExcludingIds(const PointType& queryPoint, const std::vector<unsigned int> excludedIds)
+double KMeansClustering::ClosestPointDistanceExcludingIds(const Eigen::VectorXd& queryPoint, const std::vector<unsigned int> excludedIds)
 {
   double minDist = std::numeric_limits<double>::infinity();
-  for(unsigned int pointId = 0; pointId < Points.size(); ++pointId)
+  for(unsigned int pointId = 0; pointId < this->Points.size(); ++pointId)
   {
     if(Helpers::Contains(excludedIds, pointId))
     {
       continue;
     }
-    double dist = (Points[pointId] - queryPoint).norm();
+    double dist = (this->Points.col(pointId) - queryPoint).norm();
 
     if(dist < minDist)
     {
@@ -307,7 +305,7 @@ double KMeansClustering::ClosestPointDistanceExcludingIds(const PointType& query
   return minDist;
 }
 
-double KMeansClustering::ClosestPointDistance(const PointType& queryPoint)
+double KMeansClustering::ClosestPointDistance(const Eigen::VectorXd& queryPoint)
 {
   std::vector<unsigned int> excludedIds; // none
   return ClosestPointDistanceExcludingIds(queryPoint, excludedIds);
@@ -315,39 +313,41 @@ double KMeansClustering::ClosestPointDistance(const PointType& queryPoint)
 
 void KMeansClustering::RandomInit()
 {
-  ClusterCenters.resize(this->K);
+  this->ClusterCenters.resize(this->Points.rows(), this->K);
 
   // Completely randomly choose initial cluster centers
   for(unsigned int i = 0; i < this->K; i++)
   {
-    PointType p = GetRandomPointInBounds();
+    Eigen::VectorXd p = GetRandomPointInBounds();
 
-    this->ClusterCenters[i] = p;
+    this->ClusterCenters.col(i) = p;
   }
 }
 
 void KMeansClustering::KMeansPPInit()
 {
+  this->ClusterCenters.resize(this->Points.rows(), this->K);
+
   // Assign one center at random
   unsigned int randomId = rand() % this->Points.size();
-  PointType p = this->Points[randomId];
-  this->ClusterCenters.push_back(p);
+  Eigen::VectorXd p = this->Points.col(randomId);
+  this->ClusterCenters.col(0) = p;
 
   // Assign the rest of the initial centers using a weighted probability of the distance to the nearest center
-  std::vector<double> weights(this->Points.size());
+  std::vector<double> weights(this->Points.cols());
   for(unsigned int cluster = 1; cluster < this->K; ++cluster) // Start at 1 because cluster 0 is already set
   {
     // Create weight vector
-    for(unsigned int i = 0; i < this->Points.size(); i++)
+    for(unsigned int i = 0; i < this->Points.cols(); i++)
     {
-      PointType currentPoint = this->Points[i];
+      Eigen::VectorXd currentPoint = this->Points.col(i);
       unsigned int closestCluster = ClosestCluster(currentPoint);
-      weights[i] = (this->ClusterCenters[closestCluster] - currentPoint).norm();
+      weights[i] = (this->ClusterCenters.col(closestCluster) - currentPoint).norm();
     }
 
     unsigned int selectedPointId = SelectWeightedIndex(weights);
-    p = this->Points[selectedPointId];
-    this->ClusterCenters.push_back(p);
+    p = this->Points.col(selectedPointId);
+    this->ClusterCenters.col(cluster) = p;
   }
 }
 
@@ -371,7 +371,7 @@ void KMeansClustering::SetInitMethod(const int method)
   this->InitMethod = method;
 }
 
-void KMeansClustering::SetPoints(const VectorOfPoints& points)
+void KMeansClustering::SetPoints(const Eigen::MatrixXd& points)
 {
   this->Points = points;
 }
@@ -381,7 +381,7 @@ std::vector<unsigned int> KMeansClustering::GetLabels()
   return this->Labels;
 }
 
-KMeansClustering::VectorOfPoints KMeansClustering::GetClusterCenters()
+Eigen::MatrixXd KMeansClustering::GetClusterCenters()
 {
   return this->ClusterCenters;
 }

@@ -20,11 +20,11 @@
 
 #include <iostream>
 
-KMeansClustering::VectorOfPoints GenerateData();
+Eigen::MatrixXd GenerateData();
 
 int main(int, char *[])
 {
-  KMeansClustering::VectorOfPoints points = GenerateData();
+  Eigen::MatrixXd points = GenerateData();
   KMeansClustering kmeans;
   kmeans.SetK(2);
   kmeans.SetPoints(points);
@@ -44,24 +44,25 @@ int main(int, char *[])
   return EXIT_SUCCESS;
 }
 
-KMeansClustering::VectorOfPoints GenerateData()
+Eigen::MatrixXd GenerateData()
 {
-  KMeansClustering::VectorOfPoints points;
+  // Create 6 2-D points
+  Eigen::MatrixXd points(2, 6);
 
-  KMeansClustering::PointType p = KMeansClustering::PointType::Zero(2);
+  Eigen::VectorXd p = Eigen::VectorXd::Zero(2);
   p[0] = 10; p[1] = 10;
-  points.push_back(p);
+  points.col(0) = p;
   p[0] = 10.1; p[1] = 10.1;
-  points.push_back(p);
+  points.col(1) = p;
   p[0] = 10.2; p[1] = 10.2;
-  points.push_back(p);
+  points.col(2) = p;
 
   p[0] = 5; p[1] = 5;
-  points.push_back(p);
+  points.col(3) = p;
   p[0] = 5.1; p[1] = 5.1;
-  points.push_back(p);
+  points.col(4) = p;
   p[0] = 5.2; p[1] = 5.2;
-  points.push_back(p);
+  points.col(5) = p;
   
   return points;
 }
