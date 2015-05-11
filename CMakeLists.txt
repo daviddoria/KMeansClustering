@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 Project(KMeansClustering)
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+add_subdirectory(CMakeHelpers)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x")
 
@@ -23,12 +26,11 @@ if(NOT EIGEN3_FOUND)
 endif()
 
 # Submodules
-if(NOT TARGET Helpers)
- add_subdirectory(Helpers)
-endif()
+UseSubmodule(Helpers KMeansClustering)
 
 add_library(KMeansClustering KMeansClustering.cpp)
-#TARGET_LINK_LIBRARIES(KMeansClustering )
+
+CreateSubmodule(KMeansClustering)
 
 SET(KMeansClustering_BuildExamples OFF CACHE BOOL "KMeansClustering_BuildExamples")
 if(KMeansClustering_BuildExamples)
