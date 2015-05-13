@@ -42,7 +42,7 @@ void KMeansClustering::Cluster()
   {
     std::stringstream ss;
     ss << "The number of points (" << this->Points.cols()
-       << " must be larger than the number of clusters (" << this->K << ")";
+       << ") must be larger than the number of clusters (" << this->K << ")";
     throw std::runtime_error(ss.str());
   }
   
