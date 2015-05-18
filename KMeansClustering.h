@@ -47,7 +47,10 @@ public:
   unsigned int GetK();
 
   /** Get the cluster centers.*/
-  Eigen::MatrixXd GetClusterCenters();
+  Eigen::MatrixXd GetClusterCenters() const;
+
+  /** Set the cluster centers.*/
+  void SetClusterCenters(const Eigen::MatrixXd& clusterCenters);
 
   /** Get the point ids with a specified cluster membership. */
   std::vector<unsigned int> GetIndicesWithLabel(const unsigned int label);
@@ -55,33 +58,30 @@ public:
   /** Get the points with a specified cluster membership. */
   Eigen::MatrixXd GetPointsWithLabel(const unsigned int label);
 
-  /**
-   * If this function is called, the randomness
-   * is removed for repeatability for testing.
-   */
+  /** If this function is called, the randomness is removed for repeatability for testing. */
   void SetRandom(const bool r);
 
   /** Set the points to cluster. */
   void SetPoints(const Eigen::MatrixXd& points);
 
   /** Get the cluster membership of every point. */
-  std::vector<unsigned int> GetLabels();
+  std::vector<unsigned int> GetLabels() const;
 
   /** Set which initialization method to use. */
   void SetInitMethod(const int method);
 
   /** Choices of initialization methods */
-  enum InitMethodEnum{RANDOM, KMEANSPP};
+  enum InitMethodEnum{RANDOM, KMEANSPP, MANUAL};
 
   /** Actually perform the clustering. */
   void Cluster();
 
 protected:
 
-  /** Randomly initialize cluster centers */
+  /** Randomly initialize cluster centers. */
   void RandomInit();
 
-  /** Initialize cluster centers using the KMeans++ algorithm */
+  /** Initialize cluster centers using the KMeans++ algorithm. */
   void KMeansPPInit();
 
   /** Get the membership of 'queryPoint'. */
@@ -120,13 +120,13 @@ private:
   std::vector<unsigned int> Labels;
 
   /** Should the computation be random? If false, then it is repeatable (for testing). */
-  bool Random = false;
+  bool Random = true;
 
-  /** The initialization method to use */
+  /** The initialization method to use. */
   int InitMethod = RANDOM;
 
-  /** The number of clusters to find */
-  unsigned int K;
+  /** The number of clusters to find. */
+  unsigned int K = 3;
   
   /** The points to cluster. */
   Eigen::MatrixXd Points;

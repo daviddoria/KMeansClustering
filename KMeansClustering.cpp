@@ -30,10 +30,6 @@
 
 KMeansClustering::KMeansClustering()
 {
-  this->K = 3;
-  this->InitMethod = KMEANSPP;
-
-  this->Random = true;
 }
 
 void KMeansClustering::Cluster()
@@ -64,6 +60,10 @@ void KMeansClustering::Cluster()
   else if(this->InitMethod == KMEANSPP) // http://en.wikipedia.org/wiki/K-means%2B%2B
   {
     KMeansPPInit();
+  }
+  else if(this->InitMethod == MANUAL)
+  {
+    // do nothing, the cluster centers should have been provided manually
   }
   else
   {
@@ -373,12 +373,17 @@ void KMeansClustering::SetPoints(const Eigen::MatrixXd& points)
   this->Points = points;
 }
 
-std::vector<unsigned int> KMeansClustering::GetLabels()
+std::vector<unsigned int> KMeansClustering::GetLabels() const
 {
   return this->Labels;
 }
 
-Eigen::MatrixXd KMeansClustering::GetClusterCenters()
+Eigen::MatrixXd KMeansClustering::GetClusterCenters() const
 {
   return this->ClusterCenters;
+}
+
+void KMeansClustering::SetClusterCenters(const Eigen::MatrixXd& clusterCenters)
+{
+    this->ClusterCenters = clusterCenters;
 }
