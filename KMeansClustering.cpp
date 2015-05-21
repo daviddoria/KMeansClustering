@@ -190,7 +190,7 @@ Eigen::VectorXd KMeansClustering::GetRandomPointInBounds()
   return randomVector;
 }
 
-bool KMeansClustering::CheckChanged(std::vector<unsigned int> labels, std::vector<unsigned int> oldLabels)
+bool KMeansClustering::CheckChanged(const std::vector<unsigned int>& labels, const std::vector<unsigned int>& oldLabels)
 {
   bool changed = false;
   for(unsigned int i = 0; i < labels.size(); i++)
@@ -405,13 +405,19 @@ float KMeansClustering::ComputeMLEVariance(const unsigned int clusterId) const
 {
   std::vector<unsigned int> indicesWithLabel = GetIndicesWithLabel(clusterId);
 
+  if(indicesWithLabel.size() == 0)
+  {
+      return 0;
+  }
+
   // \hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^n (x_i - \hat{x}_i)^2
+
+  Eigen::VectorXd clusterCenter = this->ClusterCenters.col(clusterId);
 
   float variance = 0;
   for(unsigned int i = 0; i < indicesWithLabel.size(); ++i)
   {
-    Eigen::VectorXd closestCenter = this->ClusterCenters.col(indicesWithLabel[i]);
-    float error = (closestCenter - this->Points.col(indicesWithLabel[i])).norm();
+    float error = (clusterCenter - this->Points.col(indicesWithLabel[i])).norm();
     variance += error;
   }
 
@@ -426,7 +432,9 @@ float KMeansClustering::ComputeBIC() const
     // where n is the number of points, sigma is the MLE variance, and k is the number of free parameters, which in XMeans is
     // (K-1) + (M*K) + 1 (where K is the K in KMeans and M is the dimensionality of the points)
     float k = (this->K - 1.0f) + (this->Points.rows() * this->K) + 1.0f;
-    return this->Points.cols() * this->ComputeMLEVariance() + k * log(this->Points.cols());
+
+    float bic = this->Points.cols() * log(this->ComputeMLEVariance()) + k * log(this->Points.cols());
+    return bic;
 }
 
 float KMeansClustering::ComputeBIC(const unsigned int clusterId) const
@@ -439,6 +447,6 @@ float KMeansClustering::ComputeBIC(const unsigned int clusterId) const
     std::vector<unsigned int> indicesWithlabel = GetIndicesWithLabel(clusterId);
 
     float k = (this->K - 1.0f) + (this->Points.rows() * this->K) + 1.0f;
-    return static_cast<float>(indicesWithlabel.size()) * this->ComputeMLEVariance(clusterId) + k *
+    return static_cast<float>(indicesWithlabel.size()) * log(this->ComputeMLEVariance(clusterId)) + k *
             log(static_cast<float>(indicesWithlabel.size()));
 }

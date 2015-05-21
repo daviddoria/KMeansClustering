@@ -121,7 +121,7 @@ protected:
   void AssignLabels();
 
   /** Determine if the membership of any point has changed. */
-  bool CheckChanged(const std::vector<unsigned int> labels, const std::vector<unsigned int> oldLabels);
+  bool CheckChanged(const std::vector<unsigned int>& labels, const std::vector<unsigned int>& oldLabels);
 
   /** Get a random point inside the bounding box of the points. */
   Eigen::VectorXd GetRandomPointInBounds();
