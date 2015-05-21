@@ -53,10 +53,10 @@ public:
   void SetClusterCenters(const Eigen::MatrixXd& clusterCenters);
 
   /** Get the point ids with a specified cluster membership. */
-  std::vector<unsigned int> GetIndicesWithLabel(const unsigned int label);
+  std::vector<unsigned int> GetIndicesWithLabel(const unsigned int label) const;
 
   /** Get the points with a specified cluster membership. */
-  Eigen::MatrixXd GetPointsWithLabel(const unsigned int label);
+  Eigen::MatrixXd GetPointsWithLabel(const unsigned int label) const;
 
   /** If this function is called, the randomness is removed for repeatability for testing. */
   void SetRandom(const bool r);
@@ -75,6 +75,21 @@ public:
 
   /** Actually perform the clustering. */
   void Cluster();
+
+  /** Compute the maximum likelihood estimate (MLE) of the variance.
+      This assumes a spherical Gaussian model (as this is the basis of KMeans),
+      which means the variance is a scalar, rather than a diagonal covariance matrix
+      or a full covariance matrix.*/
+  float ComputeMLEVariance() const;
+
+  /** Compute the maximum likelihood estimate (MLE) of the variance of just one cluster. */
+  float ComputeMLEVariance(const unsigned int clusterId) const;
+
+  /** Compute the Bayesian Information Criterion as a measure of how well the model represents the data. */
+  float ComputeBIC() const;
+
+  /** Compute the Bayesian Information Criterion as a measure of how well the model represents the data. */
+  float ComputeBIC(const unsigned int clusterId) const;
 
 protected:
 

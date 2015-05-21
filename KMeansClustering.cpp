@@ -98,7 +98,7 @@ void KMeansClustering::Cluster()
   std::cout << "KMeans finished in " << iter << " iterations." << std::endl;
 }
 
-std::vector<unsigned int> KMeansClustering::GetIndicesWithLabel(const unsigned int label)
+std::vector<unsigned int> KMeansClustering::GetIndicesWithLabel(const unsigned int label) const
 {
   std::vector<unsigned int> pointsWithLabel;
   for(unsigned int i = 0; i < this->Labels.size(); i++)
@@ -112,7 +112,7 @@ std::vector<unsigned int> KMeansClustering::GetIndicesWithLabel(const unsigned i
   return pointsWithLabel;
 }
 
-Eigen::MatrixXd KMeansClustering::GetPointsWithLabel(const unsigned int label)
+Eigen::MatrixXd KMeansClustering::GetPointsWithLabel(const unsigned int label) const
 {
   std::vector<unsigned int> indicesWithLabel = GetIndicesWithLabel(label);
 
@@ -386,4 +386,59 @@ Eigen::MatrixXd KMeansClustering::GetClusterCenters() const
 void KMeansClustering::SetClusterCenters(const Eigen::MatrixXd& clusterCenters)
 {
     this->ClusterCenters = clusterCenters;
+}
+
+float KMeansClustering::ComputeMLEVariance() const
+{
+  // \hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^n (x_i - \hat{x}_i)^2
+
+  float variance = 0;
+  for(unsigned int i = 0; i < this->K; ++i)
+  {
+    variance += ComputeMLEVariance(i);
+  }
+
+  return variance;
+}
+
+float KMeansClustering::ComputeMLEVariance(const unsigned int clusterId) const
+{
+  std::vector<unsigned int> indicesWithLabel = GetIndicesWithLabel(clusterId);
+
+  // \hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^n (x_i - \hat{x}_i)^2
+
+  float variance = 0;
+  for(unsigned int i = 0; i < indicesWithLabel.size(); ++i)
+  {
+    Eigen::VectorXd closestCenter = this->ClusterCenters.col(indicesWithLabel[i]);
+    float error = (closestCenter - this->Points.col(indicesWithLabel[i])).norm();
+    variance += error;
+  }
+
+  variance /= static_cast<float>(indicesWithLabel.size());
+  return variance;
+}
+
+float KMeansClustering::ComputeBIC() const
+{
+    // http://en.wikipedia.org/wiki/Bayesian_information_criterion
+    // BIC = n ln(\hat{\sigma}^2) + k ln(n)
+    // where n is the number of points, sigma is the MLE variance, and k is the number of free parameters, which in XMeans is
+    // (K-1) + (M*K) + 1 (where K is the K in KMeans and M is the dimensionality of the points)
+    float k = (this->K - 1.0f) + (this->Points.rows() * this->K) + 1.0f;
+    return this->Points.cols() * this->ComputeMLEVariance() + k * log(this->Points.cols());
+}
+
+float KMeansClustering::ComputeBIC(const unsigned int clusterId) const
+{
+    // http://en.wikipedia.org/wiki/Bayesian_information_criterion
+    // BIC = n ln(\hat{\sigma}^2) + k ln(n)
+    // where n is the number of points, sigma is the MLE variance, and k is the number of free parameters, which in XMeans is
+    // (K-1) + (M*K) + 1 (where K is the K in KMeans and M is the dimensionality of the points)
+
+    std::vector<unsigned int> indicesWithlabel = GetIndicesWithLabel(clusterId);
+
+    float k = (this->K - 1.0f) + (this->Points.rows() * this->K) + 1.0f;
+    return static_cast<float>(indicesWithlabel.size()) * this->ComputeMLEVariance(clusterId) + k *
+            log(static_cast<float>(indicesWithlabel.size()));
 }
