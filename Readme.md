@@ -1,5 +1,10 @@
 This is a c++ implementation of the K-Means clustering algorithm. It also includes the KMeans++ initialization algorithm.
 
+Obtaining the code:
+Please be sure to:
+ git clone --recursive 
+ 
+so that the submodules will also be checked out.
 
 Example usage:
 
